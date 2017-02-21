@@ -1,0 +1,25 @@
+/**
+\mainpage Couwbat ns-3 Module Index Page
+
+\section intro Introduction
+
+COUWBAT provides a wireless backbone for wireless small cells based on a wideband overlay Cognitive Radio technology. The system is designed by:
+
+ - Telecommunication Networks Group, Technical University Berlin
+ - AED Engineering GmbH (AED)
+
+The TKN Technical Report *Overlay Cognitive Radio for Small-Cell Backhauling – R&D Project COUWBAT* gives a detailed description of the original COUWBAT idea and design. Since then there have been many changes to how the COUWBAT system works.
+
+\section about About this documentation
+
+This developers' reference or documentation is aimed at developers, maintainers and users of this ns-3 module. It documents the building blocks of the COUWBAT implementation by providing descriptions of classes, example scripts, functions and so on. Currently it does not serve as a how-to or manual for the module and is not exhaustive. Please refer to the README for basic setup instructions and the CHANGELOG for additional information.
+ 
+\section modules Modules
+
+The Modules section accessible on the left includes the 3 major categories in the source tree.
+
+- Couwbat Models: the main implementation of the COUWBAT system
+- Couwbat Examples: practical examples which operate the COUWBAT system in different scenarios
+- Couwbat Helper Classes: these optional helpers make setting up the Couwbat Models for use easier
+ 
+*/ 

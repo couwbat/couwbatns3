@@ -1,0 +1,98 @@
+# -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+#def options(opt):
+#    pass
+
+#def configure(conf):
+#    pass
+
+def build(bld):
+    module = bld.create_ns3_module('couwbat', ['core', 'network', 'propagation', 'mobility', 'internet', 'applications'])
+    
+    module.source = [
+        'model/couwbat.cc',
+        'model/spectrum-db.cc',
+        'model/pu-net-device.cc',
+        'model/spectrum-map.cc',
+        'model/onoff-model.cc',
+        'model/once-onoff-model.cc',
+        'model/periodic-onoff-model.cc',
+        'model/random-onoff-model.cc',
+        'model/simple-couwbat-channel.cc',
+        'model/simple-couwbat-phy.cc',
+        'model/couwbat-channel.cc',
+        'model/couwbat-phy.cc',
+        'model/couwbat-mac.cc',
+        'model/couwbat-net-device.cc',
+        'model/bs-couwbat-mac.cc',
+        'model/sta-couwbat-mac.cc',
+        'model/spectrum-manager.cc',
+        'model/couwbat-err-rate-model.cc',
+        'model/couwbat-intf-helper.cc',
+        'model/couwbat-mode.cc',
+        'model/couwbat-phy-state-helper.cc',
+        'model/couwbat-tx-vector.cc',
+        'helper/couwbat-helper.cc',
+        'helper/simple-couwbat-helper.cc',
+        'model/couwbat-mac-header.cc',
+        'model/couwbat-packet-fcs.cc',
+        'model/couwbat-packet-helper.cc',
+        'model/couwbat-map-subpacket.cc',
+        'model/couwbat-ul-burst-header.cc',
+        'model/couwbat-mpdu-delimiter.cc',
+        'model/couwbat-1-byte-header.cc',
+        'model/trace-based-pu-net-device.cc',
+        'model/couwbat-tx-queue.cc',
+        'model/couwbat-meta-header.cc',
+        'model/couwbat-pss-header.cc',
+        'model/couwbat-tx-history-buffer.cc',
+        ]
+
+    headers = bld(features='ns3header')
+    headers.module = 'couwbat'
+    headers.source = [
+        'model/couwbat.h',
+        'model/spectrum-db.h',
+        'model/pu-net-device.h',
+        'model/spectrum-map.h',
+        'model/onoff-model.h',
+        'model/once-onoff-model.h',
+        'model/periodic-onoff-model.h',
+        'model/random-onoff-model.h',
+        'model/simple-couwbat-channel.h',
+        'model/simple-couwbat-phy.h',
+        'model/couwbat-channel.h',
+        'model/couwbat-phy.h',
+        'model/couwbat-mac.h',
+        'model/couwbat-net-device.h',
+        'model/bs-couwbat-mac.h',
+        'model/sta-couwbat-mac.h',
+        'model/spectrum-manager.h',
+        'model/couwbat-err-rate-model.h',
+        'model/couwbat-intf-helper.h',
+        'model/couwbat-mode.h',
+        'model/couwbat-phy-state-helper.h',
+        'model/couwbat-tx-vector.h',        
+        'helper/couwbat-helper.h',
+        'helper/simple-couwbat-helper.h',
+        'model/couwbat-mac-header.h',
+        'model/couwbat-packet-fcs.h',
+        'model/couwbat-packet-helper.h',
+        'model/couwbat-map-subpacket.h',
+        'model/couwbat-ul-burst-header.h',
+        'model/couwbat-mpdu-delimiter.h',
+        'model/couwbat-1-byte-header.h',
+        'model/trace-based-pu-net-device.h',
+        'model/couwbat-tx-queue.h',
+        'model/couwbat-meta-header.h',
+        'model/couwbat-pss-header.h',
+        'model/couwbat-tx-history-buffer.h',
+        ]
+
+    # if bld.env.ENABLE_EXAMPLES:
+        # bld.recurse('examples')
+        
+    bld.recurse('examples')
+
+    # bld.ns3_python_bindings()
+

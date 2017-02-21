@@ -1,0 +1,120 @@
+TCP:
+- windowsize adapted to delay-bandwidth-product
+
+
+********************
+
+MAC ACK scheme: !!! Temporarily disabled due to a bug with multiple STAs and ACK
+
+    The ACK scheme works as follows. A data frame (DL/UL) is sent with a certain SEQ number by MAC-A. After MAC-B receives this frame, it sends the highest SEQ it has successfully received so far in its next data frame. In case MAC-A does not receive the ACK (either data lost or ACK lost), it makes a SINGLE attempt to retransmit the same data. This is done by enqueueing that data (separate payload packets) to the front of the TxQueue. This is then sent with a new SEQ number as if it were fresh data and possibly together with actual fresh data. SEQ numbers increase continuously and the same SEQ number itself is never retransmitted.
+
+    Due to the COUWBAT protocol, the sent payloads of the 4 previous superframes (40 ms) must be kept/saved by the MAC for possible retransmission. This is the delay until the MAC receives back an ACK for a sent frame.
+
+    In case of multiple UL/DL bursts per superframe, the each n-th frame from the burst (1st, 2nd, etc.) in turn confirms/ACKs its corresponding n-th frame that was received in the previous superframe. One MAC's bursts use one single 8-bit SEQ counter.
+
+
+
+CouwbatTxHistoryBuffer class interface:
+
+    CouwbatTxHistoryBuffer offers the following functions to the MAC:
+
+    - void SuperframeTick (CouwbatTxQueue &txQueue);
+        // Must be called at the very beginning of a superframe by the MAC and given the MAC's TxQueue. The payload packets from the SEQ numbers which have not been registered as successful are enqueued into this TxQueue using its 'Reenqueue()' method.
+
+    - PacketList *GetNewList (Mac48Address dest, SeqType seq);
+        // Calling this returns a new PacketList that must be used to save all payload packets that are being sent to 'dest' using SEQ number 'seq'. 'CreateDlDataPacket()' and 'CreateUlDataPacket()' take such a list and insert the payload packets into it during the creation of new data packets.
+
+    - void RegisterAck (Mac48Address dest, SeqType seq);
+        // Register the SEQ number 'seq' that was sent to MAC 'dest' as successfully confirmed and it will not be retransmitted.
+
+********************
+
+MAC TX TxQueue:
+
+    - Supports looking up the number of packets currently in the queue by destination address. This can be used by CouwbatNetDevice to refuse sending packets if the queue is getting too full.
+
+    - CouwbatNetDevice now supports the options from couwbat.h/cc: Couwbat::mac_queue_limit_enabled , Couwbat::mac_queue_limit_size
+
+    - TODO: TCP starts acting strangely after the first time some packets are refused by CouwbatNetDevice. The data rate degrades significantly, sometimes to almost 0.
+
+********************
+
+CQI feedback/ MCS lookup:
+    In every UL frame that a STA-MAC sends, it gives CQI feedback per subchannel. The BS-MAC saves this to member variable 'm_cqiHist' of a certain maximum history length. This is then used by 'GetOptimalMcs()' to determine which are the best possible MCS values for the given channel quality.
+
+    'GetOptimalMcs()': // TODO intelligent decision with better use of history?
+
+********************
+
+PSS:
+    - MAP length is precalculated using GetMapLength
+        - STA supports flexible MAP slots
+    - similar to techreport
+    - PSS length in symbols not hardcoded in STA?
+
+ASSOC:
+    - Backup CC implemented: STA full support, BS doesn't make use of the possibility for scheduling a CC change in advance.
+    - STA schedules assocs in reply to a PSS for the next superframe. If a PSS is not received, the STA will not send an assoc in the next superframe to avoid potential PU interference (due to CC change, etc.)
+    - Backoff for association is missing, assoc frames are always sent in reply to a PSS (in one of the ALOHA slots)
+    - Due to lack of interference, the association phase is broken and is not simulated correctly. See PHY section
+
+MAP: 
+    - ugly coded
+    - works with padding
+    - Number of allocated symbols, MCS scheme per subchannel and used subchannels must always be a whole number of bytes. With the currently used MCSs, the number of bytes with any combination can only end in .0 or .5. In case of partial bytes with .5, the simplest and in a lot of cases the most efficient way to do this is by removing a few symbols from the burst to achieve a whole number of bytes
+    - missing:
+        - Use different MCS for each burst in case of multiple DL/UL bursts
+
+DL/UL:
+    - full number of symbols/ Byte padding is implemented. A potential problem exists when slots are much larger (in terms of transferrable data) than can be filled with useful data. In that case, there must be substantial amounts of zero padding to fill the slot so that it can be received by the PHY with the previously set schedule. This reduces the reliability of transmission of data when the allocated slot is substantially larger than needed.
+
+********************
+
+MISC IMPORTANT TODO:
+    - clean up couwbat.h/.cc
+        - GetSuperframeGuardSymbols & GetAlohaNrGuardSymbols. combine?
+
+    - BS only one SEQ counter
+
+    - TxQueue implement size limit? Optimize? Currently experimental implementation, can be enabled with Couwbat::mac_queue_limit_enabled
+
+    - CQI is currently 1:1 SNR. Use something more useful or better scale for 256 values?
+
+    - SNR is too high/broken
+
+    - in couwbat-phy-state-helper.cc:295 - very dirty hack to prevent cqi overflow
+
+
+============================================
+PHY:
+
+- Okumurra-hata model working
+- 
+
+- missing:
+    - fading
+    - detection treshold RX is removed, will be not enough if distance > 250m for upper frequencies
+    - Interference calc removed as no interference is assumed yet
+    - Due to lack of interference, the association phase is broken and is not simulated correctly. One assoc frame per slot will always arrive even if multiple are sent in the same slot. BS always receives the first assoc frame to which the PHY syncs and the rest are ignored, due to SimpleCouwbatPhy::StartReceivePacket "drop packet because already in Rx".
+
+- CouwbatPhyStateHelper now forwards up (triggers) MAC with dummy packets (/dev/urandom) when there is a RX schedule by the MAC but no actual RX succeeded. The PHY structure is not suitable for strict schedules due to its WiFi heritage and the current implementation is not optimal for all cases.
+
+============================================
+Netlink PHY and MAC interaction:
+
+- m_netlinkMode switch has been added to CouwbatMac which alters the way BsCouwbatMac and StaCouwbatMac behave in some ways. The mode switch allows a standalone MAC instance to run independently, without using the ns3 Simulator/Scheduler but instead in an externally triggered event-driven fashion using callbacks.
+
+- In this mode, two new member variables are used
+	- m_rxOkCallback is the packet receive function of the MAC and can be acquired using {Bs|Sta}CouwbatMac::GetRxOkCallback()
+	- m_cwnlSendCallback is the callback which the MAC uses for sending packets to the relevant component. Can be set using {Bs|Sta}CouwbatMac::SetCwnlSendCallback()
+
+- In netlink mode, any payload data to be transmitted or received by the MAC needs to come in from an external source application or go out to an external destination application in some way. This is not currently implemented and the MAC therefore transmits only service frames (PSS, assoc, etc.) between its instances and empty DL/UL frames
+
+- A new application "netlink-couwbat" has been added under couwbat/examples. It starts an independent Couwbat MAC instance and serves as the netlink component that maintains the netlink sockets, callbacks, etc. to interface the MAC with netlink.
+	- To start it, use "run_netlink_couwbat.sh" or "waf --run netlink-couwbat"
+
+	- Command line argument help: "run_netlink_couwbat.sh --help"
+
+	- For testing purposes, it creates a SF_START periodically and gives it to the MAC, which then sends packets of comamand type CW_CMD_DEBUG_DUMP to the kernel, which can be inspected in the kernel logs using for instance "dmesg". It ignores all incoming netlink messages. This is due to a lack of correct support for all commands and a periodic SF_START by the current kernel module.
+
+	- cwnl_phy_rx_cb has not yet been thoroughly tested for robustness

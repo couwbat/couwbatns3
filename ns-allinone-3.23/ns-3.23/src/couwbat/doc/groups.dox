@@ -1,0 +1,22 @@
+/**
+ * \defgroup couwbat Couwbat Models
+ *
+ * This group contains documentation for the API, implementation and classes of the ns-3 Couwbat module.
+ */
+
+/**
+ * \defgroup examples Couwbat Examples
+ * 
+ * \brief This group contains documentation for all executable waf scripts located in ``couwbat/examples/``.
+ * 
+ * The ``examples`` directory contains ns3 scripts which are executable by waf. Most of them are ns3 scenarios which run wholly within the simulator as regular ns3 modules.
+ * 
+ * ``netlink-couwbat`` and ``hw-netlink-couwbat`` are real-time implementations of the Couwbat Module. These modules use the ns3 libraries, but the ns3 simulator and scheduler themselves do not run. Instead, the Couwbat Modules run as a standalone event-based system which is connected to external systems through the script which is being run.
+ */ 
+
+/**
+ * \defgroup helper Couwbat Helper Classes
+ *
+ * This group contains documentation for the helper classes to aid in instantiating Couwbat objects in ns3 simulation scenarios.
+ */
+ 
