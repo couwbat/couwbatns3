@@ -135,7 +135,7 @@ cd ns-allinone-3.23/ns-3.23/
 http://www.nsnam.org/wiki/HOWTO_configure_Eclipse_with_ns-3
 
 ## References and further information
-For further information please consult the Technical Report [title here](link).
+For further information please consult the Technical Report [Overlay Cognitive Radio for Small-Cell Backhauling - R&D Project COUWBAT -](http://www.tkn.tu-berlin.de/fileadmin/fg112/Papers/2017/Zubow17overlay_cognitive_radio.pdf).
 
 Please use the following bibtex :
 ```
