@@ -141,12 +141,12 @@ Please use the following bibtex :
 ```
 @TechReport{Zubow17overlay_cognitive_radio,
     author = {Zubow, Anatolij and Döring, Michael and Chwalisz, Mikolaj and Wolisz, Adam},
-    title = {{Overlay Cognitive Radio for Small-Cell Backhauling -- R\&D Project COUWBAT --}},
+    title = {{COgnitive Ultra-Wide BAckhaul Transmission system -- COUWBAT}},
     institution = {Telecommunication Networks Group, Technische Universit\"{a}t Berlin},
     year = {2017},
     month = {February},
     number = {TKN-16-003},
-    url = {http://www.tkn.tu-berlin.de/fileadmin/fg112/Papers/2017/Zubow17overlay_cognitive_radio.pdf}
+    url = {http://www.tkn.tu-berlin.de/fileadmin/fg112/Papers/2017/Zubow17cognitive_ultra_wide.pdf}
     }
 ```
 
